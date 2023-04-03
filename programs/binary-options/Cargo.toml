@@ -1,0 +1,24 @@
+cargo-features = ["workspace-inheritance"]
+
+[package]
+name = "binary-options"
+version = "0.1.0"
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "binary_options"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = {workspace = true, features = ["init-if-needed"]}
+anchor-spl = {workspace = true, features = ["token"]}
+pyth-sdk = "0.7.0"
+pyth-sdk-solana = "0.7.1"
