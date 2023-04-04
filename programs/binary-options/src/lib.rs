@@ -284,9 +284,7 @@ pub mod binary_options {
         let current_price = price_feed
             .get_price_no_older_than(current_timestamp1, STALENESS_THRESHOLD)
             .ok_or(Errors::PythOffline)?;
-        //let price = (current_price.price + current_price.conf) * 10^current_price.expo;
-        //let current_price: Price = price_feed.get_price_no_older_than(current_timestamp, STALENESS_THRESHOLD).unwrap();
-        //msg!("price: ({} +- {}) x 10^{}", current_price.price, current_price.conf, current_price.expo);
+  
         let price  = current_price.price * 10^(current_price.expo as i64);
         //
 
@@ -336,7 +334,7 @@ pub mod binary_options {
 
         // We are making an assumption that if the prices match then the long position was correct
         let winning_position_bool = {
-            if strike_price == price as u64 {
+            if price > 0 && strike_price == price as u64 {
                 true
             }
             else {false}
@@ -608,46 +606,11 @@ impl DepositBaseAdmin {
 pub enum ParticipantPosition {
     Long,
     Short,
-    Unknown,// { val: u8 },
+    Unknown,
 }
 #[derive(AnchorSerialize, AnchorDeserialize, Copy, Clone)]
 pub enum Participants {
     First,
     Second,
-    Unknown,// { val: u8 },
+    Unknown,
 }
-/*
-#[error_code]
-pub enum Errors {
-    #[msg("Insufficient amount to withdraw.")]
-    InvalidWithdrawAmount,
-    #[msg("Amount must be greater than zero.")]
-    AmountNotgreaterThanZero,
-    #[msg("Withdrawal amount exceeds total payout amount.")]
-    ExceededTotalPayoutAmount,
-    #[msg("Deposit amount must be equal to bet_amount.")]
-    InvalidDepositAmount,
-    #[msg("Participant must make a prediction and win it.")]
-    InvalidPrediction,
-    #[msg("Winning Amount exceeds deposited amount.")]
-    InvalidWinningAmount,
-    #[msg("Betting cannot be created, missing data")]
-    CannotCreateBetting,
-    #[msg("Exceeded betting description max length")]
-    ExceededDescriptionMaxLength,
-    #[msg("Both predictions cannot not be same.")]
-    PredictionCannotBeSame,
-    #[msg("Single participant is not allowed to take both predictions.")]
-    PredictionDisAllowed,
-    #[msg("Participant not allowed to make a withdrawal.")]
-    WithdrawalDisAllowed,
-    #[msg("Invalid participant winner.")]
-    InvalidWinner,
-    #[msg("Create options not initialised or participants limit of two cannot be exceeded.")]
-    InvalidParticipantsLimit,
-    #[msg("Account is not initialized.")]
-    AccountNotInitialized,
-    #[msg("Account is already initialized.")]
-    AccountAlreadyInitialized,
-}
- */
