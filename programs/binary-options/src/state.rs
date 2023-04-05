@@ -7,8 +7,7 @@ use crate::Errors;
 
 #[account]
 pub struct AdminConfig {
-    pub price_feed_id:       Pubkey,
-    //pub collateral_price_feed_id: Pubkey,
+    pub price_feed_id: Pubkey,
 }
 
 #[derive(Clone)]

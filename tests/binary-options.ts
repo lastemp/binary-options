@@ -106,7 +106,16 @@ describe("binary-options", () => {
 
   it("Create Binary Options", async () => {
     // Add your test here.
-    let betDescription: string = 'test bet';
+    /*
+    A - Crypto Asset (eg SOL)
+    P - Position (This can either be a long or short position)
+    S - Strike Price (This is the predicted future price of Crypto Asset eg $35)
+    B - Bet Amount (This is the amount that the creator(first participant) of the bet will give away if the lose eg 10 SOL)
+    T - Taker amount (This is the amount that the second participant of the bet will give away if the lose eg 5 SOL)
+
+    bet description = 'A:SOL~P:LONG~S:$35~B:10SOL~T:5SOL';
+    */
+    let betDescription: string = 'A:SOL~P:LONG~S:$35~B:10SOL~T:5SOL';
     let betAmount = new anchor.BN(10 * anchor.web3.LAMPORTS_PER_SOL);
     let strikePrice = new anchor.BN(35); // SOL price
     let takerAmount = new anchor.BN(5 * anchor.web3.LAMPORTS_PER_SOL);

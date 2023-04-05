@@ -10,11 +10,10 @@ use state::AdminConfig;
 
 mod error;
 use error::Errors;
-//
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
-const DESCRIPTION_LENGTH: usize = 10; // betting description length
+const DESCRIPTION_LENGTH: usize = 40; // betting description length
 const STALENESS_THRESHOLD : u64 = 60; // staleness threshold in seconds
 
 #[program]
