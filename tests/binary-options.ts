@@ -5,7 +5,8 @@ import { BinaryOptions } from "../target/types/binary_options";
 describe("binary-options", () => {
   // Configure the client to use the local cluster.
   //anchor.setProvider(anchor.AnchorProvider.env());
-  let provider = anchor.AnchorProvider.local("http://127.0.0.1:8899")
+  //let provider = anchor.AnchorProvider.local("http://127.0.0.1:8899")
+  let provider = anchor.AnchorProvider.local("https://api.devnet.solana.com")
 
   const program = anchor.workspace.BinaryOptions as Program<BinaryOptions>;
   const admin_deposit_account = anchor.web3.Keypair.generate();
@@ -14,7 +15,28 @@ describe("binary-options", () => {
   const deposit_auth = anchor.web3.Keypair.generate(); // First participant
   const deposit_auth_2 = anchor.web3.Keypair.generate(); // Second participant
   const config = anchor.web3.Keypair.generate();
+  const fs = require('fs');
+  const assert = require("assert");
+
   let solToUSD = "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix";
+  var programKey;
+  try {
+      let data = fs.readFileSync(
+          './tests/binary_options-keypair.json'
+      );
+      programKey = anchor.web3.Keypair.fromSecretKey(
+          new Uint8Array(JSON.parse(data))
+      );
+  } catch (error) {
+      //throw new Error("Please make sure the program key is binary_options-keypair.json.");
+      throw error;
+  }
+
+  try {
+    assert(program.programId.equals(programKey.publicKey));
+  } catch (error) {
+      throw new Error("Please make sure you have the same program address in Anchor.toml and binary_options-keypair.json");
+  }
 
   // admin
   let [admin_pda_auth, admin_pda_bump] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -97,13 +119,13 @@ describe("binary-options", () => {
         adminSolVault: admin_sol_vault,
         adminAuth: admin_auth.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
-      }).signers([admin_deposit_account, admin_auth]).rpc();
+      }).signers([programKey, config, admin_deposit_account, admin_auth]).rpc();
     console.log("Your transaction signature", tx);
 
     let result = await program.account.depositBaseAdmin.fetch(admin_deposit_account.publicKey);
     console.log(result);
   });
-
+  
   it("Create Binary Options", async () => {
     // Add your test here.
     /*
@@ -135,7 +157,7 @@ describe("binary-options", () => {
     let result = await program.account.binaryOption.fetch(deposit_account.publicKey);
     console.log(result);
   });
-
+  
   it("Accept Binary Options", async () => {
     // Add your test here.
     let amount = new anchor.BN(5 * anchor.web3.LAMPORTS_PER_SOL);
@@ -144,7 +166,7 @@ describe("binary-options", () => {
     const tx = await program.methods.acceptBinaryOptions(amount, participantPosition)
       .accounts({
         adminDepositAccount: admin_deposit_account.publicKey,
-        adminPdaAuth: admin_auth.publicKey,
+        adminPdaAuth: admin_pda_auth,
         adminSolVault: admin_sol_vault,
         depositAccount: deposit_account.publicKey,
         pdaAuth: pda_auth,
@@ -170,7 +192,7 @@ describe("binary-options", () => {
         pdaAuth: pda_auth,
         solVault: sol_vault,
         adminDepositAccount: admin_deposit_account.publicKey,
-        adminPdaAuth: admin_auth.publicKey,
+        adminPdaAuth: admin_pda_auth,
         adminSolVault: admin_sol_vault,
         systemProgram: anchor.web3.SystemProgram.programId,
       }).signers([]).rpc();
@@ -205,7 +227,7 @@ describe("binary-options", () => {
     const tx = await program.methods.withdraw(amount)
       .accounts({
         adminDepositAccount: admin_deposit_account.publicKey,
-        adminPdaAuth: admin_auth.publicKey,
+        adminPdaAuth: admin_pda_auth,
         adminSolVault: admin_sol_vault,
         adminAuth: admin_auth.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,

@@ -11,7 +11,8 @@ use state::AdminConfig;
 mod error;
 use error::Errors;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+//declare_id!("AyPMWmVVp6EiJ1Unega2rkGsbg5AbcycdnHWA3zRMeN1"); localnet
+declare_id!("2xg4QrBgXovYu3dmCQB7bX1cRMDHQP9yhKTCXPbCoN9T");
 
 const DESCRIPTION_LENGTH: usize = 40; // betting description length
 const STALENESS_THRESHOLD : u64 = 60; // staleness threshold in seconds
@@ -22,9 +23,10 @@ pub mod binary_options {
 
     pub fn initialize(ctx: Context<Initialize>, config: AdminConfig) -> Result<()> {
         let deposit_account = &mut ctx.accounts.admin_deposit_account;
-        let admin_auth = &ctx.accounts.admin_auth;
+        let config_account = &mut ctx.accounts.config;
 
-        ctx.accounts.config.set_inner(config);
+        //ctx.accounts.config.set_inner(config);
+        config_account.set_inner(config);
 
         deposit_account.admin_auth = *ctx.accounts.admin_auth.key;
         deposit_account.admin_auth_bump = *ctx.bumps.get("admin_pda_auth").unwrap();
