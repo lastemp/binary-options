@@ -2,7 +2,7 @@
 seeds = false
 skip-lint = false
 [programs.localnet]
-binary_options = "AyPMWmVVp6EiJ1Unega2rkGsbg5AbcycdnHWA3zRMeN1"
+binary_options = "JCqZPL84bJQKfQ1FZ4cYSWddYNpQCBXPjowjkCcdn9ZB"
 
 [programs.devnet]
 binary_options = "2xg4QrBgXovYu3dmCQB7bX1cRMDHQP9yhKTCXPbCoN9T"
@@ -11,8 +11,8 @@ binary_options = "2xg4QrBgXovYu3dmCQB7bX1cRMDHQP9yhKTCXPbCoN9T"
 url = "https://api.apr.dev"
 
 [provider]
-#cluster = "Localnet"
-cluster = "devnet"
+cluster = "Localnet"
+#cluster = "devnet"
 wallet = "/home/lastemp/.config/solana/id.json"
 
 [scripts]

@@ -8,6 +8,8 @@ pub enum Errors {
     AmountNotgreaterThanZero,
     #[msg("Withdrawal amount exceeds total payout amount.")]
     ExceededTotalPayoutAmount,
+    #[msg("Withdrawal amount must be equal to total payout amount.")]
+    AmountNotEqualToTotalPayoutAmount,
     #[msg("Deposit amount must be equal to bet_amount.")]
     InvalidDepositAmount,
     #[msg("Participant must make a prediction and win it.")]

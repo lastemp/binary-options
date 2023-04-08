@@ -5,8 +5,8 @@ import { BinaryOptions } from "../target/types/binary_options";
 describe("binary-options", () => {
   // Configure the client to use the local cluster.
   //anchor.setProvider(anchor.AnchorProvider.env());
-  //let provider = anchor.AnchorProvider.local("http://127.0.0.1:8899")
-  let provider = anchor.AnchorProvider.local("https://api.devnet.solana.com")
+  let provider = anchor.AnchorProvider.local("http://127.0.0.1:8899")
+  //let provider = anchor.AnchorProvider.local("https://api.devnet.solana.com")
 
   const program = anchor.workspace.BinaryOptions as Program<BinaryOptions>;
   const admin_deposit_account = anchor.web3.Keypair.generate();
@@ -22,7 +22,7 @@ describe("binary-options", () => {
   var programKey;
   try {
       let data = fs.readFileSync(
-          './tests/binary_options-keypair.json'
+          './target/deploy/binary_options-keypair.json'
       );
       programKey = anchor.web3.Keypair.fromSecretKey(
           new Uint8Array(JSON.parse(data))
@@ -37,7 +37,11 @@ describe("binary-options", () => {
   } catch (error) {
       throw new Error("Please make sure you have the same program address in Anchor.toml and binary_options-keypair.json");
   }
-
+  /*
+  console.log("admin_auth.publicKey - ", admin_auth.publicKey);
+  console.log("deposit_auth.publicKey - ", deposit_auth.publicKey);
+  console.log("deposit_auth_2.publicKey - ", deposit_auth_2.publicKey);
+  */
   // admin
   let [admin_pda_auth, admin_pda_bump] = anchor.web3.PublicKey.findProgramAddressSync(
     [anchor.utils.bytes.utf8.encode("admin_auth"),
@@ -139,7 +143,7 @@ describe("binary-options", () => {
     */
     let betDescription: string = 'A:SOL~P:LONG~S:$35~B:10SOL~T:5SOL';
     let betAmount = new anchor.BN(10 * anchor.web3.LAMPORTS_PER_SOL);
-    let strikePrice = new anchor.BN(35); // SOL price
+    let strikePrice = new anchor.BN(35); // SOL price 0.79906068
     let takerAmount = new anchor.BN(5 * anchor.web3.LAMPORTS_PER_SOL);
     let participantPosition = { long: {} };
 
@@ -155,7 +159,7 @@ describe("binary-options", () => {
     console.log("Your transaction signature", tx);
 
     let result = await program.account.binaryOption.fetch(deposit_account.publicKey);
-    console.log(result);
+    console.log("createBinaryOptions: ", result);
   });
   
   it("Accept Binary Options", async () => {
@@ -177,12 +181,12 @@ describe("binary-options", () => {
     console.log("Your transaction signature", tx);
 
     let result = await program.account.binaryOption.fetch(deposit_account.publicKey);
-    console.log(result);
+    console.log("acceptBinaryOptions: ", result);
   });
 
   it("Process Prediction", async () => {
     // Add your test here.
-    let betFees = new anchor.BN(1 * anchor.web3.LAMPORTS_PER_SOL);
+    let betFees = new anchor.BN(3 * anchor.web3.LAMPORTS_PER_SOL);
 
     const tx = await program.methods.processPrediction(betFees)
       .accounts({
@@ -199,12 +203,18 @@ describe("binary-options", () => {
     console.log("Your transaction signature", tx);
 
     let result = await program.account.binaryOption.fetch(deposit_account.publicKey);
-    console.log(result);
+    console.log("processPrediction: ", result);
+    console.log("pythPrice: ", result.pythPrice);
+    console.log("pythExpo: ", result.pythExpo);
+    console.log("price: ", result.price);
+    console.log("pythPrice 2: ", result.pythPrice.toNumber());
+    console.log("pythExpo 2: ", result.pythExpo);
+    //console.log("price 2: ", result.price.toNumber());
   });
 
   it("Withdraw Participant Funds", async () => {
     // Add your test here.
-    let amount = new anchor.BN(5 * anchor.web3.LAMPORTS_PER_SOL);
+    let amount = new anchor.BN(12 * anchor.web3.LAMPORTS_PER_SOL);
 
     const tx = await program.methods.withdrawParticipantFunds(amount)
       .accounts({
@@ -217,12 +227,12 @@ describe("binary-options", () => {
     console.log("Your transaction signature", tx);
 
     let result = await program.account.binaryOption.fetch(deposit_account.publicKey);
-    console.log(result);
+    console.log("withdrawParticipantFunds: ", result);
   });
 
   it("Withdraw", async () => {
     // Add your test here.
-    let amount = new anchor.BN(2 * anchor.web3.LAMPORTS_PER_SOL);
+    let amount = new anchor.BN(1 * anchor.web3.LAMPORTS_PER_SOL);
 
     const tx = await program.methods.withdraw(amount)
       .accounts({
@@ -234,8 +244,8 @@ describe("binary-options", () => {
       }).signers([admin_auth]).rpc();
     console.log("Your transaction signature", tx);
 
-    let result = await program.account.binaryOption.fetch(admin_deposit_account.publicKey);
-    console.log(result);
+    let result = await program.account.depositBaseAdmin.fetch(admin_deposit_account.publicKey);
+    console.log("withdraw: ", result);
   });
 
 });
