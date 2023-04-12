@@ -14,7 +14,7 @@ use error::Errors;
 declare_id!("JCqZPL84bJQKfQ1FZ4cYSWddYNpQCBXPjowjkCcdn9ZB");
 
 const DESCRIPTION_LENGTH: usize = 40; // betting description length
-const STALENESS_THRESHOLD : u64 = 1800; // staleness threshold in seconds 60
+const STALENESS_THRESHOLD : u64 = 60; // staleness threshold in seconds 60
 
 #[program]
 pub mod binary_options {
@@ -292,41 +292,22 @@ pub mod binary_options {
             .get_price_no_older_than(current_timestamp1, STALENESS_THRESHOLD)
             .ok_or(Errors::PythOffline)?;
 
-        //let price  = current_price.price * 10^(current_price.expo as i64);
-        /*
-        let a = 10.0_f32;
-        let b = a.powi(current_price.expo);
-        let price = current_price.price as f32 * b;
-        */
-        let a = 10.0_f32;
-        //let b: i32 = -8;
-        let _expo = current_price.expo;
-        //let c = a.powi(b) as f64;
-        //let c = a.powi(b);
-        //let c = a.powi(b);
-        //let c = 10.0_f32.powi(-8); ***
-        let c = a.powi(_expo);
-        //let d: i64 = 2056422249;
-        let d: i64 = current_price.price;
-        //let d: i64 = 2056422249;
-        //let f = d as f64 * c as f64;
-        //let f = c as f64;
-        //let g: f64 = f.trunc();
-        //let e: u64 = f.trunc() as u64;
-        //let price  = e;
-        let f = c * d as f32;
-        let price  = f;
-
         let deposit_account = &mut ctx.accounts.deposit_account;
         let pda_auth = &mut ctx.accounts.pda_auth;
         let sol_vault = &mut ctx.accounts.sol_vault;
         let sys_program = &ctx.accounts.system_program;
 
-        // tests only
         deposit_account.pyth_price = current_price.price;
-        deposit_account.pyth_expo = _expo;//current_price.expo;
-        deposit_account._price = price;
-        let price = deposit_account.strike_price;
+        deposit_account.pyth_expo = current_price.expo;
+
+        let base: i32 = 10;
+        let exponent: i32 = deposit_account.pyth_expo;
+        // lets get the actual price based on computation
+        let result = (base as f64).powi(exponent.abs());
+        let result = if exponent < 0 { 1.0 / result } else { result };
+        let actual_price = deposit_account.pyth_price as f64 * result;
+        deposit_account.actual_price = actual_price.trunc() as u64; // We'll remove the decimals for this case
+        let actual_price = deposit_account.actual_price;
         //
 
         let strike_price = deposit_account.strike_price;
@@ -370,7 +351,7 @@ pub mod binary_options {
 
         // We are making an assumption that if the prices match then the long position was correct
         let winning_position_bool = {
-            if price > 0 && strike_price == price as u64 {
+            if actual_price > 0 && strike_price == actual_price {
                 true
             }
             else {false}
@@ -615,12 +596,9 @@ pub struct BinaryOption {
     pub deposited_amount: u64,
     pub made_prediction: bool,
     pub total_payout: u64,
-    // tests only
     pub pyth_price: i64,
     pub pyth_expo: i32,
-    //pub _price: u64,
-    pub _price: f32,
-    //
+    pub actual_price: u64,
     pub first_participant: ParticipantPosition,
     pub second_participant: ParticipantPosition,
     pub betting_state: u8,
@@ -629,6 +607,7 @@ pub struct BinaryOption {
 const DISCRIMINATOR_LENGTH: usize = 8;
 const PUBLIC_KEY_LENGTH: usize = 32;
 const U64_LENGTH: usize = 8;
+const U32_LENGTH: usize = 4;
 const U8_LENGTH: usize = 1;
 const BOOL_LENGTH: usize = 1;
 const OPTION_LENGTH: usize = 1; // 1 + (space(T))
@@ -639,7 +618,8 @@ impl BinaryOption {
                        (PUBLIC_KEY_LENGTH * 3) +
                        (1 + U8_LENGTH * 3) +
                        DESCRIPTION_LENGTH +
-                       (U64_LENGTH * 8) + //5
+                       (U64_LENGTH * 7) +
+                       U32_LENGTH +
                        BOOL_LENGTH +
                        (ENUM_LENGTH + U8_LENGTH) +
                        (ENUM_LENGTH + U8_LENGTH);
@@ -655,9 +635,7 @@ pub struct DepositBaseAdmin {
 impl DepositBaseAdmin {
     const LEN: usize = DISCRIMINATOR_LENGTH +
                        PUBLIC_KEY_LENGTH +
-                       U8_LENGTH +
-                       1 + U8_LENGTH +
-                       //(1 + 2 * U8_LENGTH) +
+                       (1 + 2 * U8_LENGTH) +
                        BOOL_LENGTH;
 }
 

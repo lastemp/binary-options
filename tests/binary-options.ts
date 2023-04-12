@@ -143,7 +143,7 @@ describe("binary-options", () => {
     */
     let betDescription: string = 'A:SOL~P:LONG~S:$35~B:10SOL~T:5SOL';
     let betAmount = new anchor.BN(10 * anchor.web3.LAMPORTS_PER_SOL);
-    let strikePrice = new anchor.BN(35); // SOL price 0.79906068
+    let strikePrice = new anchor.BN(24); // SOL price 24
     let takerAmount = new anchor.BN(5 * anchor.web3.LAMPORTS_PER_SOL);
     let participantPosition = { long: {} };
 
@@ -204,12 +204,12 @@ describe("binary-options", () => {
 
     let result = await program.account.binaryOption.fetch(deposit_account.publicKey);
     console.log("processPrediction: ", result);
-    console.log("pythPrice: ", result.pythPrice);
+    //console.log("pythPrice: ", result.pythPrice);
     console.log("pythExpo: ", result.pythExpo);
-    console.log("price: ", result.price);
-    console.log("pythPrice 2: ", result.pythPrice.toNumber());
-    console.log("pythExpo 2: ", result.pythExpo);
-    //console.log("price 2: ", result.price.toNumber());
+    //console.log("price: ", result.actualPrice);
+    console.log("pythPrice: ", result.pythPrice.toNumber());
+    console.log("actualPrice: ", result.actualPrice.toNumber());
+	console.log("totalPayout: ", result.totalPayout.toNumber() / anchor.web3.LAMPORTS_PER_SOL);
   });
 
   it("Withdraw Participant Funds", async () => {
