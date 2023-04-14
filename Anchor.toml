@@ -1,24 +1,21 @@
 [features]
 seeds = false
 skip-lint = false
-[programs.localnet]
-binary_options = "JCqZPL84bJQKfQ1FZ4cYSWddYNpQCBXPjowjkCcdn9ZB"
 
-[programs.devnet]
-binary_options = "2xg4QrBgXovYu3dmCQB7bX1cRMDHQP9yhKTCXPbCoN9T"
+[programs.testnet]
+binary_options = "JCqZPL84bJQKfQ1FZ4cYSWddYNpQCBXPjowjkCcdn9ZB"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
-#cluster = "devnet"
-wallet = "/home/lastemp/.config/solana/id.json"
+cluster = "testnet"
+wallet = "~/.config/solana/id.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
 
 [test.validator]
-url = "https://api.devnet.solana.com"
+url = "https://api.testnet.solana.com"
 [test]
 startup_wait = 20000

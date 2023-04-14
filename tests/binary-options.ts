@@ -5,8 +5,7 @@ import { BinaryOptions } from "../target/types/binary_options";
 describe("binary-options", () => {
   // Configure the client to use the local cluster.
   //anchor.setProvider(anchor.AnchorProvider.env());
-  let provider = anchor.AnchorProvider.local("http://127.0.0.1:8899")
-  //let provider = anchor.AnchorProvider.local("https://api.devnet.solana.com")
+  let provider = anchor.AnchorProvider.local("https://api.testnet.solana.com")
 
   const program = anchor.workspace.BinaryOptions as Program<BinaryOptions>;
   const admin_deposit_account = anchor.web3.Keypair.generate();
@@ -18,7 +17,8 @@ describe("binary-options", () => {
   const fs = require('fs');
   const assert = require("assert");
 
-  let solToUSD = "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix";
+  //let solToUSD = "J83w4HKfqxwcq3BEMMkPFSppX3gqekLyLJBexebFVkix"; // https://pyth.network/developers/price-feed-ids#solana-devnet
+  let solToUSD = "7VJsBtJzgTftYzEeooSDYyjKXvYRWJHdwvbwfBvTg9K"; // https://pyth.network/developers/price-feed-ids#solana-testnet
   var programKey;
   try {
       let data = fs.readFileSync(
@@ -143,7 +143,7 @@ describe("binary-options", () => {
     */
     let betDescription: string = 'A:SOL~P:LONG~S:$35~B:10SOL~T:5SOL';
     let betAmount = new anchor.BN(10 * anchor.web3.LAMPORTS_PER_SOL);
-    let strikePrice = new anchor.BN(24); // SOL price 24
+    let strikePrice = new anchor.BN(25); // SOL price 25
     let takerAmount = new anchor.BN(5 * anchor.web3.LAMPORTS_PER_SOL);
     let participantPosition = { long: {} };
 
